@@ -1,9 +1,4 @@
 from flask import Flask, request, render_template_string
-import google.generativeai as genai
-import os
-
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-1.5-flash")
 
 app = Flask(__name__)
 
@@ -16,45 +11,24 @@ def home():
     </head><body class="bg-light">
     <div class="container mt-5 text-center">
         <h1>🛏️ SleepVista Agent Hub</h1>
-        <p class="lead">Generate full Etsy listings in seconds.<br>You only approve the draft in Etsy.</p>
+        <p class="lead">Your marketplace is now live and stable!</p>
         <form action="/generate" method="post">
-            <input type="text" name="theme" class="form-control form-control-lg mb-3" placeholder="Theme (e.g. misty mountain layers v2)" required>
-            <button type="submit" class="btn btn-success btn-lg">Generate Full Listing →</button>
+            <input type="text" name="theme" class="form-control form-control-lg mb-3" placeholder="Type a theme (e.g. misty mountain layers v2)" required>
+            <button type="submit" class="btn btn-success btn-lg">Generate Listing</button>
         </form>
     </div></body></html>
     ''')
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    theme = request.form.get('theme', '')
-    
-    prompt = f"""You are an expert Etsy seller for SleepVista Art.
-Create a complete listing for theme: {theme}
-
-Rules from vault:
-- Title format: "Theme Name | Horizontal Oil Painting Print | Calming Bedroom Art | SleepVista Art"
-- Description must include the full science block at the top, bundle link, and "Hang as the last thing you see before bed"
-- 13 tags, each ≤20 characters
-- 9 mockup prompts using the exact vault structure (Prompt 1 to 9, with custom bedroom variations for this theme)
-
-Output ONLY in this clean format:
-TITLE: 
-DESCRIPTION: 
-TAGS: 
-MOCKUP PROMPTS 1-9:
-"""
-
-    response = model.generate_content(prompt)
-    result = response.text
-
-    return render_template_string('''
+    theme = request.form.get('theme', 'test')
+    return f'''
     <div class="container mt-5">
-        <h1>✅ Listing Generated for: {{theme}}</h1>
-        <pre style="background:#222;color:#0f0;padding:20px;font-family:monospace;white-space:pre-wrap">{{result}}</pre>
-        <p>Copy everything above into Etsy. You only approve the draft.</p>
-        <a href="/" class="btn btn-success">Generate Another Listing</a>
+        <h1>✅ Generated for: {theme}</h1>
+        <p>This is the stable base version. Next step: full Gemini-powered listings.</p>
+        <a href="/" class="btn btn-primary">Back to Home</a>
     </div>
-    ''', theme=theme, result=result)
+    '''
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
